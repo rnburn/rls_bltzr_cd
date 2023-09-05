@@ -72,6 +72,7 @@ def sxt_cc_component(
         deps_p = [
             ":" + name,
         ] + deps + test_deps
+        is_cuda = True
         if is_cuda:
             cuda_library(
                 name = name + "-test-lib",
@@ -84,10 +85,10 @@ def sxt_cc_component(
                     "cuda",
                 ],
                 alwayslink = alwayslink,
-                deps = deps_p + [
+                deps = depset(deps_p + [
                     "@local_cuda//:cuda_headers",
                     "@local_cuda//:cuda_runtime_static",
-                ],
+                ]),
                 visibility = ["//visibility:public"],
                 **kwargs
             )
