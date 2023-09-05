@@ -73,25 +73,35 @@ def sxt_cc_component(
         deps_p = [
             ":" + name,
         ] + deps + test_deps
-        device_test_name = name + "-device.t"
-        # cuda_dlink(
-        #     name = device_test_name,
-        #     deps = deps_p,
-        # )
         if is_cuda:
-          return
-        #     cuda_test(
-        #         name = name + ".t",
-        #         srcs = [
-        #             name + ".t.cc",
-        #         ],
-        #         copts = sxt_copts() + copts,
-        #         deps = deps_p + [
-        #             ":" + device_test_name,
-        #         ],
-        #         visibility = ["//visibility:public"],
-        #         **kwargs
-        #     )
+            cuda_library(
+                name = name + "-test-lib",
+                srcs = [
+                    name + ".t.cc",
+                ],
+                copts = sxt_copts() + [
+                    "-x",
+                    "cuda",
+                ],
+                alwayslink = alwayslink,
+                deps = deps_p + [
+                    "@local_cuda//:cuda_headers",
+                    "@local_cuda//:cuda_runtime_static",
+                ],
+                visibility = ["//visibility:public"],
+                **kwargs
+            )
+            device_test_name = name + "-device.t"
+            native.cc_test(
+                name = name + ".t",
+                srcs = [],
+                copts = sxt_copts() + copts,
+                deps = [
+                  ":" + name + "-test-lib",
+                ],
+                visibility = ["//visibility:public"],
+                **kwargs
+            )
         else:
             native.cc_test(
                 name = name + ".t",
@@ -100,9 +110,6 @@ def sxt_cc_component(
                 ],
                 copts = sxt_copts() + copts,
                 deps = deps_p,
-                # + [
-                #     ":" + device_test_name,
-                # ],
                 visibility = ["//visibility:public"],
                 **kwargs
             )
