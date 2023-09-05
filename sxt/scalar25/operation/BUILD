@@ -36,38 +36,39 @@ sxt_cc_component(
     ],
 )
 
-# sxt_cc_component(
-#     name = "inner_product",
-#     impl_deps = [
-#         ":accumulator",
-#         ":mul",
-#         ":muladd",
-#         ":product_mapper",
-#         "//sxt/base/error:assert",
-#         "//sxt/base/device:memory_utility",
-#         "//sxt/algorithm/reduction:reduction",
-#         "//sxt/memory/management:managed_array",
-#         "//sxt/memory/resource:async_device_resource",
-#     ],
-#     is_cuda = True,
-#     test_deps = [
-#         ":overload",
-#         "//sxt/base/test:unit_test",
-#         "//sxt/scalar25/type:literal",
-#         "//sxt/scalar25/random:element",
-#         "//sxt/execution/async:future",
-#         "//sxt/execution/schedule:scheduler",
-#         "//sxt/base/num:fast_random_number_generator",
-#         "//sxt/base/device:memory_utility",
-#         "//sxt/memory/management:managed_array",
-#         "//sxt/memory/resource:device_resource",
-#     ],
-#     deps = [
-#         "//sxt/base/container:span",
-#         "//sxt/base/device:stream",
-#         "//sxt/execution/async:future_fwd",
-#     ],
-# )
+sxt_cc_component(
+    name = "inner_product",
+    impl_deps = [
+        ":accumulator",
+        ":add",
+        ":mul",
+        ":muladd",
+        ":product_mapper",
+        "//sxt/base/error:assert",
+        "//sxt/base/device:memory_utility",
+        "//sxt/algorithm/reduction:reduction",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:async_device_resource",
+    ],
+    is_cuda = True,
+    test_deps = [
+        ":overload",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/random:element",
+        "//sxt/execution/async:future",
+        "//sxt/execution/schedule:scheduler",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/base/device:memory_utility",
+        "//sxt/memory/management:managed_array",
+        "//sxt/memory/resource:device_resource",
+    ],
+    deps = [
+        "//sxt/base/container:span",
+        "//sxt/base/device:stream",
+        "//sxt/execution/async:future_fwd",
+    ],
+)
 
 sxt_cc_component(
     name = "neg",
