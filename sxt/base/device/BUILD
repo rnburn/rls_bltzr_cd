@@ -86,6 +86,7 @@ sxt_cc_component(
 sxt_cc_component(
     name = "memory_utility",
     impl_deps = [
+        ":active_device_guard",
         ":pointer_attributes",
         ":stream",
         ":state",
@@ -96,7 +97,6 @@ sxt_cc_component(
     test_deps = [
         ":pointer_attributes",
         ":state",
-        "//sxt/base/container:span",
         "//sxt/base/test:unit_test",
         "@local_cuda//:cuda_headers",
         "@local_cuda//:cuda_runtime_static",
@@ -105,6 +105,7 @@ sxt_cc_component(
         "//sxt/base/concept:memcpyable_ranges",
         "//sxt/base/error:assert",
         "//sxt/base/type:raw_stream",
+        "//sxt/base/container:span",
     ],
 )
 

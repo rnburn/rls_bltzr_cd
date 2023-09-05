@@ -36,15 +36,15 @@ def sxt_cc_component(
                 name + ".cc",
             ],
             copts = sxt_copts() + [
-                "--device-c",
+                # "--device-c",
                 "-x",
                 "cuda",
             ],
             alwayslink = alwayslink,
-            linkstatic = 1,
+            # linkstatic = 1,
             deps = deps + impl_deps + [
-                "@local_config_cuda//cuda:cuda_headers",
-                "@local_config_cuda//cuda:cudart_static",
+                "@local_cuda//:cuda_headers",
+                "@local_cuda//:cuda_runtime_static",
             ],
             visibility = ["//visibility:public"],
             **kwargs
