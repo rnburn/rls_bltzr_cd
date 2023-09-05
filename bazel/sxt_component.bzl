@@ -35,13 +35,12 @@ def sxt_cc_component(
             srcs = [
                 name + ".cc",
             ],
+            rdc = True,
             copts = sxt_copts() + [
-                # "--device-c",
                 "-x",
                 "cuda",
             ],
             alwayslink = alwayslink,
-            # linkstatic = 1,
             deps = deps + impl_deps + [
                 "@local_cuda//:cuda_headers",
                 "@local_cuda//:cuda_runtime_static",
@@ -76,6 +75,7 @@ def sxt_cc_component(
         if is_cuda:
             cuda_library(
                 name = name + "-test-lib",
+                rdc = True,
                 srcs = [
                     name + ".t.cc",
                 ],

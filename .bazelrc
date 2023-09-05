@@ -27,3 +27,5 @@ build --action_env CXX=/usr/bin/clang++-18
 # build --ui_event_filters=-INFO
 
 common:bzlmod --enable_bzlmod
+
+build --spawn_strategy local
