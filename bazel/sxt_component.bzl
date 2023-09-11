@@ -19,6 +19,7 @@ def sxt_copts():
 def sxt_cc_component(
         name,
         copts = [],
+        linkopts = [],
         is_cuda = False,
         with_test = True,
         alwayslink = False,
@@ -40,6 +41,7 @@ def sxt_cc_component(
                 "-x",
                 "cuda",
             ],
+            linkopts = linkopts,
             alwayslink = alwayslink,
             deps = deps + impl_deps + [
                 "@local_cuda//:cuda_headers",
@@ -100,6 +102,7 @@ def sxt_cc_component(
                 deps = [
                   ":" + name + "-test-lib",
                 ],
+                linkopts = linkopts,
                 visibility = ["//visibility:public"],
                 **kwargs
             )

@@ -1,4 +1,5 @@
 build --experimental_cc_implementation_deps
+build --experimental_cc_shared_library
 
 common --announce_rc
 
@@ -29,3 +30,4 @@ build --action_env CXX=/usr/bin/clang++-18
 common:bzlmod --enable_bzlmod
 
 build --spawn_strategy local
+build --sandbox_add_mount_pair=.:/tmp

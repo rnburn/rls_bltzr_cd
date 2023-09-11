@@ -1,0 +1,196 @@
+load(
+    "//bazel:sxt_component.bzl",
+    "sxt_cc_component",
+)
+load("@rules_cuda//cuda:defs.bzl", "cuda_library")
+load(
+    "//bazel:cuda_dlink.bzl",
+    "cuda_dlink",
+)
+
+# cuda_library(
+#     name = "cbindings_device",
+#     deps = [
+#         ":backend",
+#         ":get_generators",
+#         ":get_one_commit",
+#         ":inner_product_proof",
+#         ":pedersen",
+#     ],
+# )
+
+cuda_library(
+  name = "blitar_lib",
+  rdc = True,
+  alwayslink = 1,
+  srcs = [
+    "empty.cc",
+  ],
+  deps = [
+      ":backend",
+      ":get_generators",
+      ":get_one_commit",
+      ":inner_product_proof",
+      ":pedersen",
+  ]
+)
+
+cc_binary(
+    name = "libblitzar.so",
+    linkopts = [
+        "-Wl,--version-script=$(location :libblitzar-export-map.ld)",
+        "-Wl,--allow-multiple-definition",
+    ],
+    linkshared = 1,
+    visibility = ["//visibility:public"],
+    copts = [
+      # "-x", "cuda",
+      "-fgpu-rdc",
+    ],
+    deps = [
+      ":blitar_lib",
+        # ":backend",
+        # ":get_generators",
+        # ":get_one_commit",
+        # ":inner_product_proof",
+        # ":pedersen",
+        ":libblitzar-export-map.ld",
+    ] + select({
+        "//bazel:portable_glibc_build": [
+            "//bazel:glibc_version_lib",
+        ],
+        "//conditions:default": [],
+    }),
+)
+
+sxt_cc_component(
+    name = "blitzar_api",
+    with_test = False,
+)
+
+sxt_cc_component(
+    name = "backend",
+    is_cuda = True,
+    linkopts = [
+        "-Wl,--allow-multiple-definition",
+    ],
+    impl_deps = [
+        "//sxt/base/device:property",
+        "//sxt/base/error:assert",
+        "//sxt/cbindings/backend:gpu_backend",
+        "//sxt/cbindings/backend:cpu_backend",
+        "//sxt/seqcommit/generator:precomputed_initializer",
+    ],
+    test_deps = [
+        "//sxt/base/test:unit_test",
+    ],
+    deps = [
+        ":blitzar_api",
+        "//sxt/cbindings/backend:computational_backend",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "get_generators",
+    impl_deps = [
+        ":backend",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/base/error:assert",
+    ],
+    is_cuda = True,
+    test_deps = [
+        ":backend",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/seqcommit/generator:base_element",
+    ],
+    deps = [
+        ":blitzar_api",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "get_one_commit",
+    impl_deps = [
+        ":backend",
+        "//sxt/base/error:assert",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/seqcommit/generator:precomputed_one_commitments",
+    ],
+    is_cuda = True,
+    test_deps = [
+        ":backend",
+        ":get_generators",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/curve21/operation:add",
+    ],
+    deps = [
+        ":blitzar_api",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "pedersen",
+    impl_deps = [
+        ":backend",
+        "//sxt/base/error:assert",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/memory/management:managed_array",
+        "//sxt/multiexp/base:exponent_sequence",
+        "//sxt/ristretto/type:compressed_element",
+    ],
+    is_cuda = True,
+    test_deps = [
+        ":backend",
+        "//sxt/base/error:assert",
+        "//sxt/base/test:unit_test",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/ristretto/base:byte_conversion",
+        "//sxt/ristretto/operation:add",
+        "//sxt/ristretto/operation:overload",
+        "//sxt/ristretto/operation:scalar_multiply",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/seqcommit/generator:base_element",
+    ],
+    deps = [
+        ":blitzar_api",
+    ],
+    alwayslink = 1,
+)
+
+sxt_cc_component(
+    name = "inner_product_proof",
+    impl_deps = [
+        ":backend",
+        "//sxt/base/container:span",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/base/error:assert",
+        "//sxt/proof/inner_product:proof_descriptor",
+    ],
+    is_cuda = True,
+    test_deps = [
+        ":backend",
+        ":get_generators",
+        "//sxt/base/test:unit_test",
+        "//sxt/scalar25/type:element",
+        "//sxt/curve21/type:element_p3",
+        "//sxt/proof/transcript:transcript",
+        "//sxt/ristretto/type:compressed_element",
+        "//sxt/base/num:ceil_log2",
+        "//sxt/scalar25/type:literal",
+        "//sxt/scalar25/operation:overload",
+        "//sxt/curve21/operation:overload",
+        "//sxt/base/num:fast_random_number_generator",
+        "//sxt/scalar25/random:element",
+        "//sxt/base/error:assert",
+    ],
+    deps = [
+        ":blitzar_api",
+    ],
+    alwayslink = 1,
+)
